@@ -26,7 +26,7 @@ And if you want to send this up to production. Run
 ```shell
 npm run build
 ```
-After this is finished copy the contents of the dist folder, and copy it to where the production site is held.
+After this is finished copy the contents of the dist folder, and paste it to where the production site is held.
 ## Authors
 
 - [@myMartelus](https://www.github.com/myMartelus)
