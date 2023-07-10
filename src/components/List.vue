@@ -1,8 +1,16 @@
 <script setup lang="ts">
+import { onMounted, ref } from "vue";
 import { useNftStore } from "../stores/getNFTData.ts";
+import defineContract from "../ts/defineContract";
 import getPrice from "../ts/getPrice";
 
 const store = useNftStore();
+
+let contract = ref(null) as any
+
+onMounted(() => {
+  contract.value = defineContract()
+})
 
 let selectNft = (item: any) => {
   let foundOne = true;
@@ -16,6 +24,7 @@ let selectNft = (item: any) => {
     ? store.actionAddNftSelected(item)
     : store.actionRemoveNftSelected(item);
 };
+
 
 let lookForSelectedNft = (item: any) => {
   let foundOne = false;
@@ -65,12 +74,13 @@ let lookForSelectedNft = (item: any) => {
               <span class="mb-4"> Eth: {{ getPrice(item.edition) }} </span>
             </p>
            
+              <p class="has-text-centered"> Select</p>
           </div>
             <div class="buttons is-centered m-4">
               <RouterLink
                 class="button is-info is-outlined is-fullwidth is-rounded"
                 :to="'/nft/' + item.edition"
-              >View More</RouterLink>
+              >Details</RouterLink>
             </div>
           <div class="p-2"></div>
         </div>

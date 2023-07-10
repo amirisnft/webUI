@@ -1,74 +1,74 @@
 <script setup lang="ts">
-import {ethers} from "ethers"
-import abi from "../assets/json/Amiris.json"
+import { ethers } from "ethers";
+import abi from "../assets/json/Amiris.json";
 declare global {
   interface Window {
     ethereum: any;
   }
 }
-import { onMounted, ref } from "vue";
+import { onMounted, ref, computed } from "vue";
 import { useNftStore } from "../stores/getNFTData.ts";
-import getPrice from "../ts/getPrice"
+import getPrice from "../ts/getPrice";
 
 const store = useNftStore();
 
 let drawer = ref(null) as any;
-// let wallet = null as any
 let connected = ref(false);
 let loading = ref(false);
 let walletExists = ref(false);
-let contract = ref(null) as any
-let userAddress = ref("") as any
-// let walletStatus = "dne"
+let contract = ref(null) as any;
+let userAddress = ref("") as any;
 
 onMounted(() => {
   drawer = document.getElementById("drawer");
   if (window.ethereum) {
-    console.log(abi)
+    console.log(abi);
     walletExists.value = true;
-    // const data = import.meta.glob('../assets/json/Amiris.json')
-    console.log(ethers)
-    // web3.value = new ethers.providers.Web3Provider(window.ethereum, "any")
+    console.log(ethers);
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner();
-    let contractAddress= "0x7cC952b97Bb84997ef7C20f88dF0066BCe36c2E2"
-    contract.value = new ethers.Contract(contractAddress, JSON.stringify(abi.abi), signer);
-
+    let contractAddress = "0xF59a3786c27c9C610e4632f04802F55E414af89b";
+    contract.value = new ethers.Contract(
+      contractAddress,
+      JSON.stringify(abi.abi),
+      signer
+    );
   }
-
-
 });
 
 
-
-let mint = async (item: any) =>  {
-  console.log(item)
-  // const provider = new ethers.providers.Web3Provider(window.ethereum);
-  // const signer = provider.getSigner();
-
-  let tokens = [] as any
+let totalPrice = computed(() => {
   let price = 0
+  for(let i of store.getSelectedNftData) {
+      price += getPrice(i.edition) as  any
+  }
+  return price
+})
+
+let mint = async (item: any) => {
+  console.log(item);
+
+  let tokens = [] as any;
+  let price = 0;
 
   item.forEach((element: any) => {
-    tokens.push(element.edition)
-    price += getPrice(element.edition)!
+    tokens.push(element.edition);
+    price += getPrice(element.edition)!;
   });
 
-
-  console.log(ethers.utils.parseEther(price.toString()))
+  console.log(ethers.utils.parseEther(price.toString()));
   await contract.value.mint(userAddress.value, tokens, {
     value: ethers.utils.parseEther(price.toString()),
     // gasPrice:"285000"
-  })
-  store.actionRemoveNftSelected(item)
-}
-
+  });
+  store.actionRemoveNftSelected(item);
+};
 
 let connectWallet = async () => {
   loading.value = true;
   try {
     window.ethereum.request({ method: "eth_requestAccounts" });
-    userAddress.value = window.ethereum.selectedAddress
+    userAddress.value = window.ethereum.selectedAddress;
     connected.value = true;
     loading.value = false;
   } catch {}
@@ -118,6 +118,25 @@ const toggleMenu = () => {
           </div>
         </div>
 
+        <div class="my-3">
+          <h1 class="has-text-centered">
+            <span class="mb-4"> Total Eth: </span>
+            <svg
+              class="icon"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+            >
+              <title>ethereum</title>
+              <path
+                d="M12,1.75L5.75,12.25L12,16L18.25,12.25L12,1.75M5.75,13.5L12,22.25L18.25,13.5L12,17.25L5.75,13.5Z"
+              />
+            </svg>
+            <span class="mb-4">{{ totalPrice }} </span>
+          </h1>
+        </div>
+
         <div v-if="loading == false">
           <div class="buttons is-centered mt-4">
             <div v-show="walletExists == true">
@@ -128,17 +147,24 @@ const toggleMenu = () => {
               >
                 Connect
               </button>
-              <button v-else class="button is-rounded is-info is-outlined" @click="mint(store.getSelectedNftData)">
+              <button
+                v-else
+                class="button is-rounded is-info is-outlined"
+                @click="mint(store.getSelectedNftData)"
+              >
                 Mint
               </button>
             </div>
             <div v-show="walletExists == false">
-              <a class="button is-rounded is-outlined is-fullwidth is-info" href="https://metamask.io/">
+              <a
+                class="button is-rounded is-outlined is-fullwidth is-info"
+                href="https://metamask.io/"
+              >
                 <svg
                   fill="none"
                   height="30"
                   viewBox="0 0 40 40"
-                  style="position: relative; top: 3px; "
+                  style="position: relative; top: 3px"
                   width="30"
                   xmlns="http://www.w3.org/2000/svg"
                 >
@@ -278,14 +304,17 @@ const toggleMenu = () => {
                     ></path>
                   </g>
                 </svg>
-                <span style="position: relative;">MetaMask</span>
+                <span style="position: relative">MetaMask</span>
               </a>
-              <a class="button is-rounded is-outlined is-fullwidth is-info" href="https://www.coinbase.com/wallet">
+              <a
+                class="button is-rounded is-outlined is-fullwidth is-info"
+                href="https://www.coinbase.com/wallet"
+              >
                 <svg
                   fill="none"
                   height="30"
                   viewBox="0 0 200 200"
-                  style="position: relative;  right: 5px"
+                  style="position: relative; right: 5px"
                   width="30"
                   xmlns="http://www.w3.org/2000/svg"
                 >
@@ -304,7 +333,7 @@ const toggleMenu = () => {
                       d="M825 1167 c-3 -7 -4 -87 -3 -177 l3 -165 175 0 175 0 0 175 0 175 -173 3 c-135 2 -174 0 -177 -11z"
                     ></path>
                   </g></svg
-                ><span style="position: relative; ">Coinbase</span>
+                ><span style="position: relative">Coinbase</span>
               </a>
             </div>
           </div>

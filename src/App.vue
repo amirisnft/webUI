@@ -5,9 +5,12 @@ import { useNftStore } from "./stores/getNFTData.ts";
 import { onMounted } from "vue";
 
 const store = useNftStore();
-onMounted(() => {
+
+onMounted(async () => {
   store.actionGetNftData();
+
 });
+
 </script>
 
 <template>
