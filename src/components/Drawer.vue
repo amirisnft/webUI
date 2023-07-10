@@ -8,6 +8,7 @@ declare global {
 }
 import { onMounted, ref } from "vue";
 import { useNftStore } from "../stores/getNFTData.ts";
+import getPrice from "../ts/getPrice"
 
 const store = useNftStore();
 
@@ -30,7 +31,7 @@ onMounted(() => {
     // web3.value = new ethers.providers.Web3Provider(window.ethereum, "any")
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner();
-    let contractAddress= "0xA4bE2965Ef9B1dF06945f87C7741F834b89c811C"
+    let contractAddress= "0x7cC952b97Bb84997ef7C20f88dF0066BCe36c2E2"
     contract.value = new ethers.Contract(contractAddress, JSON.stringify(abi.abi), signer);
 
   }
@@ -38,52 +39,25 @@ onMounted(() => {
 
 });
 
-let getPrice = (_id: number) => {
-  if (_id <= 50) {
-    return 0.01;
-  } else if (_id <= 85) {
-    return 0.03;
-  } else if (_id <= 125) {
-    return 0.05;
-  } else if (_id <= 200) {
-    return 0.1;
-  } else if (_id <= 220) {
-    return 0.3;
-  } else if (_id <= 255) {
-    return 0.5;
-  } else if (_id <= 280) {
-    return 1;
-  } else if (_id <= 320) {
-    return 2;
-  } else if (_id <= 340) {
-    return 3;
-  } else if (_id <= 350) {
-    return 4;
-  } else if (_id <= 370) {
-    return 5;
-  } else if (_id <= 380) {
-    return 8;
-  } else if (_id <= 390) {
-    return 55;
-  } else if (_id <= 395) {
-    return 88;
-  } else if (_id <= 400) {
-    return 555;
-  } else if (_id <= 410) {
-    return 888;
-  } else if (_id <= 420) {
-    return 5555;
-  }
-};
 
 
 let mint = async (item: any) =>  {
   console.log(item)
   // const provider = new ethers.providers.Web3Provider(window.ethereum);
   // const signer = provider.getSigner();
-  console.log(ethers.utils.parseEther(getPrice(item.edition)?.toString()))
-  await contract.value.mint(userAddress.value, item.edition, {
-    value: ethers.utils.parseEther(getPrice(item.edition)?.toString()),
+
+  let tokens = [] as any
+  let price = 0
+
+  item.forEach((element: any) => {
+    tokens.push(element.edition)
+    price += getPrice(element.edition)!
+  });
+
+
+  console.log(ethers.utils.parseEther(price.toString()))
+  await contract.value.mint(userAddress.value, tokens, {
+    value: ethers.utils.parseEther(price.toString()),
     // gasPrice:"285000"
   })
   store.actionRemoveNftSelected(item)
@@ -154,7 +128,7 @@ const toggleMenu = () => {
               >
                 Connect
               </button>
-              <button v-else class="button is-rounded is-info is-outlined" @click="mint(store.getSelectedNftData[0])">
+              <button v-else class="button is-rounded is-info is-outlined" @click="mint(store.getSelectedNftData)">
                 Mint
               </button>
             </div>

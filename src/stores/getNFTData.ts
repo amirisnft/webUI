@@ -20,6 +20,19 @@ export const useNftStore = defineStore('nft', {
       }
     },
 
+    async actionGetIndividualNftData(edition: any) {
+      let data = {
+        method:"GET"
+      }
+      try {
+        let response = await fetch("https://ipfs.io/ipfs/QmXsSBr4YSysQaFKWigNyfjAaPJmDxdaC5hpEmFCVQXKai/"+edition+".json", data)
+        let mainData = await response.json()
+        return mainData
+      } catch(err) {
+        console.log(err)
+      }
+    },
+
     async actionAddNftSelected(item: any) {
       this.selectedNfts.push(item)
     },
