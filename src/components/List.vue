@@ -56,7 +56,7 @@ let lookForSelectedNft = (item: any) => {
           </figure>
           <div class="m-2" @click="selectNft(item)">
             <h1 class="is-size-5 has-text-centered my-4 has-text-weight-bold">
-              {{ item.name }}
+              {{ item.name }} 
             </h1>
             <p class="is-size-6 my-4 icon-text">
               <svg

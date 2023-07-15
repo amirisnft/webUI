@@ -9,44 +9,40 @@ declare global {
 import { onMounted, ref, computed } from "vue";
 import { useNftStore } from "../stores/getNFTData.ts";
 import getPrice from "../ts/getPrice";
+import defineContract from "../ts/defineContract";
 
 const store = useNftStore();
 
 let drawer = ref(null) as any;
+// let wallet = null as any
 let connected = ref(false);
 let loading = ref(false);
 let walletExists = ref(false);
 let contract = ref(null) as any;
 let userAddress = ref("") as any;
+// let walletStatus = "dne"
 
 onMounted(() => {
   drawer = document.getElementById("drawer");
   if (window.ethereum) {
     console.log(abi);
+    contract.value = defineContract();
     walletExists.value = true;
-    console.log(ethers);
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
-    let contractAddress = "0xF59a3786c27c9C610e4632f04802F55E414af89b";
-    contract.value = new ethers.Contract(
-      contractAddress,
-      JSON.stringify(abi.abi),
-      signer
-    );
   }
 });
 
-
 let totalPrice = computed(() => {
-  let price = 0
-  for(let i of store.getSelectedNftData) {
-      price += getPrice(i.edition) as  any
+  let price = 0;
+  for (let i of store.getSelectedNftData) {
+    price += getPrice(i.edition) as any;
   }
-  return price
-})
+  return price;
+});
 
 let mint = async (item: any) => {
   console.log(item);
+  // const provider = new ethers.providers.Web3Provider(window.ethereum);
+  // const signer = provider.getSigner();
 
   let tokens = [] as any;
   let price = 0;

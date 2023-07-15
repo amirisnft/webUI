@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ethers } from "ethers";
-import abi from "../../assets/json/Amiris.json";
+import defineContract from "../../ts/defineContract";
+
 declare global {
   interface Window {
     ethereum: any;
@@ -29,24 +30,20 @@ onMounted(async () => {
     if (foundOne.value == false) break;
   }
   if (window.ethereum) {
+    contract.value = defineContract()
     walletExists.value = true;
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
-    let contractAddress = "0xF59a3786c27c9C610e4632f04802F55E414af89b";
-    contract.value = new ethers.Contract(
-      contractAddress,
-      JSON.stringify(abi.abi),
-      signer
-    );
   }
 });
 
 let isMinted = async () => {
   contract.value.alreadyExistingTokens(nftData.value.edition).then((val: any) => {
     if (val != 0x0000000000000000000000000000000000000000) {
+      console.log("not");
+      console.log(val);
       isMint.value = true;
     } else {
       isMint.value = false;
+      console.log("yes");
     }
   });
 };
@@ -56,9 +53,10 @@ let mint = async (item: any) => {
   let price = 0;
   tokens.push(item.edition);
   price += getPrice(item.edition)!;
+  console.log(price.toString(), tokens)
   await contract.value.mint(userAddress.value, tokens, {
     value: ethers.utils.parseEther(price.toString()),
-    // gasPrice:"285000"
+    gasPrice:"285000"
   });
   store.actionRemoveNftSelected(item);
 };

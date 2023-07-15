@@ -14,7 +14,7 @@ export const useNftStore = defineStore('nft', {
 
       for(let i = 0; i < 420; i++) {
 
-        let response = await fetch("https://ipfs.io/ipfs/QmXsSBr4YSysQaFKWigNyfjAaPJmDxdaC5hpEmFCVQXKai/"+i+".json", data)
+        let response = await fetch("https://ipfs.io/ipfs/QmePA9nEXMBKaV5MxMQVp8GobAaTzXrYr3X6Pit8pkS9wQ/"+i+".json", data)
         let mainData = await response.json()
         this.nfts.push(mainData)
       }
@@ -25,7 +25,7 @@ export const useNftStore = defineStore('nft', {
         method:"GET"
       }
       try {
-        let response = await fetch("https://ipfs.io/ipfs/QmXsSBr4YSysQaFKWigNyfjAaPJmDxdaC5hpEmFCVQXKai/"+edition+".json", data)
+        let response = await fetch("https://ipfs.io/ipfs/QmePA9nEXMBKaV5MxMQVp8GobAaTzXrYr3X6Pit8pkS9wQ/"+edition+".json", data)
         let mainData = await response.json()
         return mainData
       } catch(err) {
